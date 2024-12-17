@@ -101,7 +101,7 @@ if st.button("Run Analysis"):
         st.dataframe(display_results)
 
         # Prepare CSV for download
-        csv = display_results.to_csv(index=False).encode('utf-8')
+        csv = display_results.to_csv(index=True).encode('utf-8')
         st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
     except Exception as e:
         st.error(f"Error: {e}")
