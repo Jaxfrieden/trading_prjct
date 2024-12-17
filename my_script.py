@@ -60,7 +60,7 @@ ticker = st.text_input("Enter stock ticker (e.g., AAPL, NVDA):", "NVDA").upper()
 
 # Restrict end date to today and start date to any past date
 today = datetime.date.today()
-start_date = st.date_input("Enter start date (any valid past date):", value=today - pd.Timedelta(days=300), max_value=today)
+start_date = st.date_input("Enter start date (any valid past date):", value=today - pd.Timedelta(days=700), max_value=today)
 end_date = st.date_input("Enter end date (cannot be in the future):", value=today, min_value=start_date, max_value=today)
 
 volume_threshold = st.number_input(
