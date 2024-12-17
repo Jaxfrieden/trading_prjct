@@ -91,13 +91,17 @@ if st.button("Run Analysis"):
         data = identify_breakout_days(data, volume_threshold, price_threshold, rolling_window)
         results = calculate_holding_returns(data, holding_period)
 
+        # Filter the displayed columns
+        displayed_columns = ['Close', 'Volume', f'{rolling_window}Day_Avg_Volume', 'Daily_Return',
+                             'Buy_Price', 'Sell_Price', 'Return']
+        display_results = results[displayed_columns].dropna()
+
         # Display Results
         st.subheader("Breakout Days with Returns and Metrics:")
-        st.dataframe(results[['Close', 'Volume', f'{rolling_window}Day_Avg_Volume', 'Daily_Return',
-                              'Buy_Price', 'Sell_Price', 'Return']].dropna())
+        st.dataframe(display_results)
 
-        # Download Results
-        csv = results.to_csv(index=False).encode('utf-8')
+        # Prepare CSV for download (same displayed data)
+        csv = display_results.to_csv(index=False).encode('utf-8')
         st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
     except Exception as e:
         st.error(f"Error: {e}")
