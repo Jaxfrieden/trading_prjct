@@ -6,7 +6,8 @@ import yfinance as yf
 # Function to fetch stock data
 def fetch_stock_data(ticker, start_date, end_date, rolling_window):
     start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window+1)).strftime('%Y-%m-%d')
-    data = yf.download(ticker, start=start_date_with_buffer, end=end_date)
+    adjusted_end_date = (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+    data = yf.download(ticker, start=start_date_with_buffer, end=adjusted_end_date)
     if data.empty:
         st.error("No data found for the specified ticker and date range.")
         st.stop()
@@ -29,18 +30,32 @@ def identify_breakout_days(data, volume_threshold, price_threshold, rolling_wind
     return data
 
 # Calculate Holding Returns
+# def calculate_holding_returns(data, holding_period):
+#     breakout_days = data[data['Breakout_Day']].copy()
+#     breakout_days['Buy_Price'] = breakout_days['Close']
+#     breakout_days['Sell_Price'] = data['Close'].shift(-holding_period).loc[breakout_days.index]
+#     breakout_days['Return'] = ((breakout_days['Sell_Price'] - breakout_days['Buy_Price']) / breakout_days['Buy_Price']) * 100
+#     return breakout_days
 def calculate_holding_returns(data, holding_period):
     breakout_days = data[data['Breakout_Day']].copy()
     breakout_days['Buy_Price'] = breakout_days['Close']
-    breakout_days['Sell_Price'] = data['Close'].shift(-holding_period).loc[breakout_days.index]
+    sell_prices = []
+
+    for breakout_date in breakout_days.index:
+        future_dates = data.loc[breakout_date:].iloc[1:holding_period+1]['Close']
+        sell_price = future_dates.iloc[-1] if not future_dates.empty else None
+        sell_prices.append(sell_price)
+
+    breakout_days['Sell_Price'] = sell_prices
     breakout_days['Return'] = ((breakout_days['Sell_Price'] - breakout_days['Buy_Price']) / breakout_days['Buy_Price']) * 100
+    breakout_days = breakout_days.dropna(subset=['Sell_Price'])
     return breakout_days
+
 
 # Streamlit UI
 st.title("Stock Breakout Analysis Tool")
 
 # User Inputs
-# User Inputs with Validated Ranges
 ticker = st.text_input("Enter stock ticker (e.g., AAPL, NVDA):", "NVDA").upper()
 
 # Restrict end date to today and start date to any past date
@@ -50,17 +65,17 @@ end_date = st.date_input("Enter end date (cannot be in the future):", value=toda
 
 volume_threshold = st.number_input(
     "Volume breakout threshold (must be > 100%):",
-    min_value=100.01, value=200.0, step=1.0
+    min_value=100.1, value=200.0, step=0.1
 )
 
 price_threshold = st.number_input(
     "Price breakout threshold (must be > 0%):",
-    min_value=0.01, value=2.0, step=0.1
+    min_value=0.1, value=2.0, step=0.1
 )
 
 holding_period = st.number_input(
     "Holding period in days (must be >= 1):",
-    min_value=1, value=5, step=1
+    min_value=1, value=10, step=1
 )
 
 rolling_window = st.number_input(
