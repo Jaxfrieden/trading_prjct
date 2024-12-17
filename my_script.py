@@ -40,13 +40,33 @@ def calculate_holding_returns(data, holding_period):
 st.title("Stock Breakout Analysis Tool")
 
 # User Inputs
-ticker = st.text_input("Enter stock ticker (e.g., AAPL):", "AAPL").upper()
-start_date = st.date_input("Enter start date:", pd.to_datetime("2024-01-01"))
-end_date = st.date_input("Enter end date:", pd.to_datetime("2024-06-01"))
-volume_threshold = st.number_input("Volume breakout threshold (e.g., 200 for 200%):", 200.0)
-price_threshold = st.number_input("Price breakout threshold (e.g., 2 for 2%):", 2.0)
-holding_period = st.number_input("Holding period in days:", 5, step=1)
-rolling_window = st.number_input("Rolling window for lookback period (e.g., 20 for 20 days):", 20, step=1)
+# User Inputs with Validated Ranges
+ticker = st.text_input("Enter stock ticker (e.g., AAPL, NVDA):", "NVDA").upper()
+
+# Restrict end date to today and start date to any past date
+today = datetime.date.today()
+start_date = st.date_input("Enter start date (any valid past date):", value=today - pd.Timedelta(days=300), max_value=today)
+end_date = st.date_input("Enter end date (cannot be in the future):", value=today, min_value=start_date, max_value=today)
+
+volume_threshold = st.number_input(
+    "Volume breakout threshold (must be > 100%):",
+    min_value=100.01, value=200.0, step=1.0
+)
+
+price_threshold = st.number_input(
+    "Price breakout threshold (must be > 0%):",
+    min_value=0.01, value=2.0, step=0.1
+)
+
+holding_period = st.number_input(
+    "Holding period in days (must be >= 1):",
+    min_value=1, value=5, step=1
+)
+
+rolling_window = st.number_input(
+    "Rolling window for lookback period (must be > 1):",
+    min_value=2, value=20, step=1
+)
 
 if st.button("Run Analysis"):
     try:
