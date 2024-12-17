@@ -100,7 +100,7 @@ if st.button("Run Analysis"):
         st.subheader("Breakout Days with Returns and Metrics:")
         st.dataframe(display_results)
 
-        # Prepare CSV for download (same displayed data)
+        # Prepare CSV for download
         csv = display_results.to_csv(index=False).encode('utf-8')
         st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
     except Exception as e:
