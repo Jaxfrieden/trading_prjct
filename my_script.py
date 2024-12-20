@@ -131,20 +131,13 @@ with col2:
             text = bars.mark_text(
                 align='center',
                 color='black',
-            ).encode(
-                y=alt.Y(
-                    'Return:Q',
-                    title='Return (%)',
-                    axis=None,
-                    stack=None,
-                    impute=None
-                ),
-                text=alt.Text('Return:Q', format='.2f'),
                 dy=alt.condition(
-                    alt.datum.Return > 0,  # If Return > 0, position text above the bar
+                    alt.datum.Return > 0,  
                     alt.value(-10),      # Adjust upward
                     alt.value(10)        # Adjust downward
                 )
+            ).encode(
+                text=alt.Text('Return:Q', format='.2f')
             )
 
             # Mean line
@@ -176,13 +169,13 @@ with col2:
             )
 
             # Define a title string
-            chart_title = f"{ticker} | start_date: {start_date} | end_date: {end_date} | volume_threshold: {volume_threshold}% | price_change_threshold: {price_threshold}% | holding_days: {holding_period}"
+            chart_title = f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
 
             final_chart = (bars + text + mean_line + mean_text).properties(
                 width='container',
                 height=400,
                 title=chart_title,
-                background='white'
+                background='white' 
             ).configure_axis(
                 labelColor='black',
                 titleColor='black'
@@ -200,6 +193,7 @@ with col2:
             st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
     else:
         st.warning("No data found for the given inputs.")
+
 
 
 # import streamlit as st
