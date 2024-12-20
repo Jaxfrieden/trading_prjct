@@ -128,18 +128,19 @@ with col2:
             )
 
             # Text on top or bottom of each bar based on Return value
-            text = bars.mark_text(
+            text = alt.Chart(chart_data).mark_text(
                 align='center',
-                color='black'
-            ).encode(
-                text=alt.Text('Return:Q', format='.2f'),
-                y=alt.Y(
-                    'Return:Q',
-                    axis=None,
-                    scale=alt.Scale(domainMid=0)  # Adjust position dynamically
+                color='black',
+                dy=alt.condition(
+                    alt.datum.Return > 0,  # If Return > 0, position text above the bar
+                    alt.value(-10),      # Adjust upward
+                    alt.value(10)        # Adjust downward
                 )
+            ).encode(
+                x=alt.X('TradeNumber:O'),
+                y=alt.Y('Return:Q'),
+                text=alt.Text('Return:Q', format='.2f')
             )
-
 
             # Mean line
             mean_data = pd.DataFrame({'Value': [mean_return]})
@@ -150,7 +151,7 @@ with col2:
             # Mean line label
             mean_text = alt.Chart(mean_data).mark_text(
                 align='left',
-                baseline='middle',
+                baseline='top',
                 dx=5,
                 color='blue'
             ).encode(
@@ -158,13 +159,13 @@ with col2:
                 text=alt.value(f"Mean: {mean_return:.2f}%")
             )
 
-            # Legend for Mean Return %
-            mean_legend = alt.Chart(pd.DataFrame({'Label': ['Mean Return %']})).mark_text(
+            # Add Mean Legend
+            legend = alt.Chart(mean_data).mark_text(
                 align='left',
                 baseline='top',
-                color='blue',
                 dx=10,
-                fontSize=12
+                fontSize=12,
+                color='blue'
             ).encode(
                 text=alt.value("Mean Return %")
             )
@@ -172,11 +173,11 @@ with col2:
             # Define a title string
             chart_title = f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
 
-            final_chart = (bars + text + mean_line + mean_text).properties(
+            final_chart = (bars + text + mean_line + mean_text + legend).properties(
                 width='container',
                 height=400,
                 title=chart_title,
-                background='white' 
+                background='white'
             ).configure_axis(
                 labelColor='black',
                 titleColor='black'
@@ -194,6 +195,7 @@ with col2:
             st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
     else:
         st.warning("No data found for the given inputs.")
+
 
 
 
