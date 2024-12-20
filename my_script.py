@@ -128,18 +128,29 @@ with col2:
             )
 
             # Text on top or bottom of each bar based on Return value
-            text = alt.Chart(chart_data).mark_text(
+            text_positive = alt.Chart(chart_data).mark_text(
                 align='center',
                 color='black',
-                dy=alt.condition(
-                    alt.datum.Return > 0,  # If Return > 0, position text above the bar
-                    alt.value(-10),      # Adjust upward
-                    alt.value(10)        # Adjust downward
-                )
+                dy=-10  # Static value to move text upward
             ).encode(
                 x=alt.X('TradeNumber:O'),
                 y=alt.Y('Return:Q'),
                 text=alt.Text('Return:Q', format='.2f')
+            ).transform_filter(
+                alt.datum.Return > 0  # Only show for positive returns
+            )
+            
+            # Text for negative returns (below the bar)
+            text_negative = alt.Chart(chart_data).mark_text(
+                align='center',
+                color='black',
+                dy=10  # Static value to move text downward
+            ).encode(
+                x=alt.X('TradeNumber:O'),
+                y=alt.Y('Return:Q'),
+                text=alt.Text('Return:Q', format='.2f')
+            ).transform_filter(
+                alt.datum.Return <= 0  # Only show for negative returns
             )
 
 
@@ -174,7 +185,7 @@ with col2:
             # Define a title string
             chart_title = f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
 
-            final_chart = (bars + text + mean_line + mean_text + legend).properties(
+            final_chart = (bars + text_positive + text_negative + mean_line + mean_text + legend).properties(
                 width='container',
                 height=400,
                 title=chart_title,
