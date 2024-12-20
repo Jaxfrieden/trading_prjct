@@ -5,7 +5,7 @@ import yfinance as yf
 import altair as alt
 
 # Set Streamlit to wide mode
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", theme="light")
 
 # Function to fetch stock data
 def fetch_stock_data(ticker, start_date, end_date, rolling_window):
@@ -163,7 +163,7 @@ with col2:
             # Mean line label
             mean_text = alt.Chart(mean_data).mark_text(
                 align='left',
-                baseline='top',
+                baseline='bottom',
                 dx=5,
                 color='blue'
             ).encode(
@@ -171,21 +171,10 @@ with col2:
                 text=alt.value(f"Mean: {mean_return:.2f}%")
             )
 
-            # Add Mean Legend
-            legend = alt.Chart(mean_data).mark_text(
-                align='left',
-                baseline='top',
-                dx=10,
-                fontSize=12,
-                color='blue'
-            ).encode(
-                text=alt.value("Mean Return %")
-            )
-
             # Define a title string
-            chart_title = f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
+            chart_title = f"{ticker} | start: {start_date} | end: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | hold days: {holding_period}"
 
-            final_chart = (bars + text_positive + text_negative + mean_line + mean_text + legend).properties(
+            final_chart = (bars + text_positive + text_negative + mean_line + mean_text).properties(
                 width='container',
                 height=400,
                 title=chart_title,
