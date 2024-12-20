@@ -153,7 +153,7 @@ with col2:
 
 
             # mean line
-            mean_data = pd.DataFrame({'Meanl Return(%)': [mean_return]})
+            mean_data = pd.DataFrame({'Mean Return(%)': [mean_return]})
             mean_line = alt.Chart(mean_data).mark_rule(strokeDash=[4,4], color='blue').encode(
                 y='Value:Q'
             )
