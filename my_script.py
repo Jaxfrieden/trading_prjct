@@ -170,14 +170,14 @@ with col2:
             #     text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
             # )
             mean_text = alt.Chart(mean_data).mark_text(
-                align='center',  # Center alignment for top-center positioning
-                baseline='top',  # Align at the top of the chart
-                fontSize=14,  # Adjust font size
+                align='center',  
+                baseline='top',  
+                fontSize=14,  
                 fontWeight='bold',  # Make the text bold
                 color='blue'  # Text color
             ).encode(
-                x=alt.value(250),  # Adjust the horizontal position as needed for center
-                y=alt.value(-10),  # Position the text slightly above the chart
+                x=alt.value(400),  
+                y=alt.value(-100),
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
             )
 
