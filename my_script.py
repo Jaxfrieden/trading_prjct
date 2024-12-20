@@ -159,23 +159,11 @@ with col2:
             )
 
             # mean line label
-            mean_highlight = alt.Chart(mean_data).mark_rect(
-                color='yellow',
-                opacity=0.6
-            ).encode(
-                x=alt.value(5), 
-                x2=alt.value(120), 
-                y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False), title=None),
-                y2=alt.value(mean_return - 0.2)  # Align rectangle with text vertically
-            )
-
-            # Mean line label
             mean_text = alt.Chart(mean_data).mark_text(
                 align='left',
-                baseline='middle',
-                dx=5,
-                fontSize=14,  # Make the text larger
-                fontWeight='bold',  # Make the text bold
+                baseline='bottom',
+                fontSize=14, 
+                fontWeight='bold',
                 color='blue'
             ).encode(
                 y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False)),
