@@ -173,7 +173,7 @@ with col2:
             #title string
             chart_title = f"Stock: {ticker} | start: {start_date} | end: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | hold days: {holding_period}"
 
-            final_chart = (bars + text_positive + text_negative + mean_line + mean_text + mean_highlight).properties(
+            final_chart = (bars + text_positive + text_negative + mean_line + mean_text).properties(
                 width='container',
                 height=400,
                 title=chart_title,
