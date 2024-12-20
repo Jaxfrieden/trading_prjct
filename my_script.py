@@ -160,9 +160,9 @@ with col2:
 
             # mean line label
             mean_text = alt.Chart(mean_data).mark_text(
-                align='left',
+                align='center',
                 baseline='bottom',
-                fontSize=14, 
+                fontSize=12, 
                 fontWeight='bold',
                 color='blue'
             ).encode(
