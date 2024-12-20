@@ -159,13 +159,22 @@ with col2:
             )
 
             # mean line label
+            mean_highlight = alt.Chart(mean_data).mark_rect(
+                color='yellow',
+                opacity=0.6
+            ).encode(
+                x=alt.value(5), 
+                x2=alt.value(120), 
+                y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False), title=None),
+                y2=alt.value(0)  
+            )
             mean_text = alt.Chart(mean_data).mark_text(
                 align='left',
                 baseline='bottom',
                 dx=5,
                 color='blue',
                 fontSize=12,  
-                fontWeight='bold',
+                fontWeight='bold'
             ).encode(
                 y='Mean Return(%):Q',
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
@@ -174,7 +183,7 @@ with col2:
             #title string
             chart_title = f"Stock: {ticker} | start: {start_date} | end: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | hold days: {holding_period}"
 
-            final_chart = (bars + text_positive + text_negative + mean_line + mean_text).properties(
+            final_chart = (bars + text_positive + text_negative + mean_line + mean_text + mean_highlight).properties(
                 width='container',
                 height=400,
                 title=chart_title,
