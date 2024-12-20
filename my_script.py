@@ -159,16 +159,28 @@ with col2:
             )
 
             # mean line label
+            # mean_text = alt.Chart(mean_data).mark_text(
+            #     align='left',
+            #     baseline='bottom',
+            #     fontSize=12, 
+            #     fontWeight='bold',
+            #     color='blue'
+            # ).encode(
+            #     y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False)),
+            #     text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
+            # )
             mean_text = alt.Chart(mean_data).mark_text(
-                align='center',
-                baseline='bottom',
-                fontSize=12, 
-                fontWeight='bold',
-                color='blue'
+                align='center',  # Center alignment for top-center positioning
+                baseline='top',  # Align at the top of the chart
+                fontSize=14,  # Adjust font size
+                fontWeight='bold',  # Make the text bold
+                color='blue'  # Text color
             ).encode(
-                y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False)),
+                x=alt.value(250),  # Adjust the horizontal position as needed for center
+                y=alt.value(-10),  # Position the text slightly above the chart
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
             )
+
 
             #title string
             chart_title = f"Stock: {ticker} | start: {start_date} | end: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | hold days: {holding_period}"
