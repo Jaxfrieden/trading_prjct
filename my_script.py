@@ -130,15 +130,16 @@ with col2:
             # Text on top or bottom of each bar based on Return value
             text = bars.mark_text(
                 align='center',
-                color='black',
-                dy=alt.condition(
-                    alt.datum.Return > 0,  
-                    alt.value(-10),      # Adjust upward
-                    alt.value(10)        # Adjust downward
-                )
+                color='black'
             ).encode(
-                text=alt.Text('Return:Q', format='.2f')
+                text=alt.Text('Return:Q', format='.2f'),
+                y=alt.Y(
+                    'Return:Q',
+                    axis=None,
+                    scale=alt.Scale(domainMid=0)  # Adjust position dynamically
+                )
             )
+
 
             # Mean line
             mean_data = pd.DataFrame({'Value': [mean_return]})
