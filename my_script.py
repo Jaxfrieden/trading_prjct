@@ -142,6 +142,7 @@ with col2:
                 text=alt.Text('Return:Q', format='.2f')
             )
 
+
             # Mean line
             mean_data = pd.DataFrame({'Value': [mean_return]})
             mean_line = alt.Chart(mean_data).mark_rule(strokeDash=[4,4], color='blue').encode(
