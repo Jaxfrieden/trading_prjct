@@ -166,17 +166,19 @@ with col2:
                 x=alt.value(5), 
                 x2=alt.value(120), 
                 y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False), title=None),
-                y2=alt.value(0)  
+                y2=alt.value(mean_return - 0.2)  # Align rectangle with text vertically
             )
+
+            # Mean line label
             mean_text = alt.Chart(mean_data).mark_text(
                 align='left',
-                baseline='bottom',
+                baseline='middle',
                 dx=5,
-                color='blue',
-                fontSize=12,  
-                fontWeight='bold'
+                fontSize=14,  # Make the text larger
+                fontWeight='bold',  # Make the text bold
+                color='blue'
             ).encode(
-                y='Mean Return(%):Q',
+                y=alt.Y('Mean Return(%):Q', scale=alt.Scale(zero=False)),
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
             )
 
