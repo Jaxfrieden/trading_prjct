@@ -5,7 +5,7 @@ import yfinance as yf
 import altair as alt
 
 # Set Streamlit to wide mode
-st.set_page_config(layout="wide", theme="light")
+st.set_page_config(layout="wide")
 
 # Function to fetch stock data
 def fetch_stock_data(ticker, start_date, end_date, rolling_window):
