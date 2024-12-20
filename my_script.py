@@ -155,7 +155,7 @@ with col2:
             # mean line
             mean_data = pd.DataFrame({'Mean Return(%)': [mean_return]})
             mean_line = alt.Chart(mean_data).mark_rule(strokeDash=[4,4], color='blue').encode(
-                y='Value:Q'
+                y='Mean Return(%):Q'
             )
 
             # mean line label
@@ -165,7 +165,7 @@ with col2:
                 dx=5,
                 color='blue'
             ).encode(
-                y='Value:Q',
+                y='Mean Return(%):Q',
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
             )
 
