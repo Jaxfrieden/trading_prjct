@@ -166,7 +166,6 @@ with col2:
                 color='blue',
                 fontSize=12,  
                 fontWeight='bold',
-                backgroundColor='yellow'
             ).encode(
                 y='Mean Return(%):Q',
                 text=alt.value(f"Mean Return(%): {mean_return:.2f}%")
