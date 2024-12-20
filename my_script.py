@@ -76,7 +76,6 @@ rolling_window = st.number_input(
     min_value=2, value=20, step=1
 )
 
-# Automatic update on parameter changes
 data = fetch_stock_data(ticker, start_date, end_date, rolling_window)
 
 if not data.empty:
@@ -109,10 +108,10 @@ if not data.empty:
         # Prepare data for chart
         chart_data = display_results.reset_index().rename(columns={'index':'Date'})
         
-        # Create bar chart with conditional coloring
+        # Bars
         bars = alt.Chart(chart_data).mark_bar().encode(
             x=alt.X('Date:T', title='Date'),
-            y=alt.Y('Return:Q', title='Return %'),
+            y=alt.Y('Return:Q', title='Return (%)'),
             color=alt.condition(
                 alt.datum.Return > 0,
                 alt.value('green'),
@@ -121,21 +120,30 @@ if not data.empty:
             tooltip=['Date:T', 'Return:Q']
         )
 
-        # Data for mean line
+        # Mean line
         mean_data = pd.DataFrame({'Metric': ['Mean Return'], 'Value': [mean_return]})
-
-        # Mean line with legend
-        mean_line = alt.Chart(mean_data).mark_rule().encode(
+        mean_line = alt.Chart(mean_data).mark_rule(strokeDash=[4,4], color='blue').encode(
             y='Value:Q',
-            color=alt.Color('Metric:N', legend=alt.Legend(title='')),
-            tooltip=['Value:Q']
+            tooltip=[alt.Tooltip('Value:Q', title='Mean Return')]
         )
 
-        # Layer the bars and mean line
-        final_chart = alt.layer(bars, mean_line).properties(
+        # Define a title string
+        chart_title = f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
+
+        final_chart = (bars + mean_line).properties(
             width='container',
             height=400,
-            title=f"{ticker} | start date: {start_date} | end date: {end_date} | volume threshold: {volume_threshold}% | price change threshold: {price_threshold}% | holding days: {holding_period}"
+            title=chart_title
+        ).configure_view(
+            background='white'
+        ).configure_axis(
+            labelColor='black',
+            titleColor='black'
+        ).configure_title(
+            color='black'
+        ).configure_legend(
+            labelColor='black',
+            titleColor='black'
         )
 
         st.altair_chart(final_chart, use_container_width=True)
@@ -143,6 +151,7 @@ if not data.empty:
         # Prepare CSV for download
         csv = display_results.to_csv(index=True).encode('utf-8')
         st.download_button("Download Results as CSV", csv, "breakout_results.csv", "text/csv")
+
 
 # import streamlit as st
 # import pandas as pd
