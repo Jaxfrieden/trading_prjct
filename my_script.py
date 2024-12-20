@@ -133,8 +133,7 @@ if not data.empty:
         final_chart = (bars + mean_line).properties(
             width='container',
             height=400,
-            title=chart_title
-        ).configure_view(
+            title=chart_title,
             background='white'
         ).configure_axis(
             labelColor='black',
