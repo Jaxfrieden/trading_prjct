@@ -8,39 +8,50 @@ import altair as alt
 st.set_page_config(layout="wide")
 
 # function to fetch stock data
-@st.cache_data(ttl=3600)  # Cache results for 1 hour
-def fetch_stock_data(ticker, start_date, end_date, rolling_window, retries=3, wait=5):
-    start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window + 1)).strftime('%Y-%m-%d')
-    adjusted_end_date = (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def fetch_stock_data(ticker, start_date, end_date, rolling_window, api_key="JTZY3JJMV97GT0MF"):
+    st.info(f"Fetching data for {ticker} from Alpha Vantage...")
+    url = f"https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_DAILY_ADJUSTED",
+        "symbol": ticker,
+        "outputsize": "full",
+        "datatype": "json",
+        "apikey": api_key
+    }
 
-    for attempt in range(retries):
-        try:
-            st.info(f"Fetching data for {ticker} (Attempt {attempt + 1})...")
-            data = yf.download(
-                ticker,
-                start=start_date_with_buffer,
-                end=adjusted_end_date,
-                progress=False
-            )
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
 
-            if data.empty:
-                st.warning("Downloaded data is empty. Check ticker and date range.")
-                return pd.DataFrame()
-
-            if isinstance(data.columns, pd.MultiIndex):
-                data.columns = data.columns.droplevel(1)
-
-            return data
-
-        except yf.YFRateLimitError:
-            st.warning(f"Rate limited by Yahoo Finance. Retrying in {wait} seconds...")
-            time.sleep(wait)
-        except Exception as e:
-            st.error(f"Unexpected error while downloading data: {e}")
+        if "Time Series (Daily)" not in data:
+            st.error("Error fetching data. Please check the ticker symbol or API limits.")
             return pd.DataFrame()
 
-    st.error("Failed to download data after multiple retries due to rate limits.")
-    return pd.DataFrame()
+        df = pd.DataFrame(data['Time Series (Daily)']).T
+        df.index = pd.to_datetime(df.index)
+        df = df.rename(columns={
+            "1. open": "Open",
+            "2. high": "High",
+            "3. low": "Low",
+            "4. close": "Close",
+            "5. adjusted close": "Adj Close",
+            "6. volume": "Volume"
+        })
+        df = df[["Open", "High", "Low", "Close", "Adj Close", "Volume"]].astype(float)
+        df = df.sort_index()
+
+        # Apply rolling window buffer logic
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+        buffer_start = start_date - pd.tseries.offsets.BDay(rolling_window + 1)
+        df = df[(df.index >= buffer_start) & (df.index <= end_date)]
+
+        return df
+
+    except Exception as e:
+        st.error(f"Error during Alpha Vantage fetch: {e}")
+        return pd.DataFrame()
 # def fetch_stock_data(ticker, start_date, end_date, rolling_window):
 #     start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window+1)).strftime('%Y-%m-%d')
 #     adjusted_end_date = (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
