@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import datetime
 import requests
-import yfinance as yf
+#import yfinance as yf
 import altair as alt
 
 # streamlit to wide mode
