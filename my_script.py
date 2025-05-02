@@ -8,16 +8,49 @@ import altair as alt
 st.set_page_config(layout="wide")
 
 # function to fetch stock data
-def fetch_stock_data(ticker, start_date, end_date, rolling_window):
-    start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window+1)).strftime('%Y-%m-%d')
+@st.cache_data(ttl=3600)  # Cache results for 1 hour
+def fetch_stock_data(ticker, start_date, end_date, rolling_window, retries=3, wait=5):
+    start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window + 1)).strftime('%Y-%m-%d')
     adjusted_end_date = (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-    data = yf.download(ticker, start=start_date_with_buffer, end=adjusted_end_date)
-    if data.empty:
-        st.error("No data found for the specified ticker and date range.")
-        return pd.DataFrame()
-    if isinstance(data.columns, pd.MultiIndex):
-        data.columns = data.columns.droplevel(1)
-    return data
+
+    for attempt in range(retries):
+        try:
+            st.info(f"Fetching data for {ticker} (Attempt {attempt + 1})...")
+            data = yf.download(
+                ticker,
+                start=start_date_with_buffer,
+                end=adjusted_end_date,
+                progress=False
+            )
+
+            if data.empty:
+                st.warning("Downloaded data is empty. Check ticker and date range.")
+                return pd.DataFrame()
+
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.droplevel(1)
+
+            return data
+
+        except yf.YFRateLimitError:
+            st.warning(f"Rate limited by Yahoo Finance. Retrying in {wait} seconds...")
+            time.sleep(wait)
+        except Exception as e:
+            st.error(f"Unexpected error while downloading data: {e}")
+            return pd.DataFrame()
+
+    st.error("Failed to download data after multiple retries due to rate limits.")
+    return pd.DataFrame()
+# def fetch_stock_data(ticker, start_date, end_date, rolling_window):
+#     start_date_with_buffer = (pd.to_datetime(start_date) - pd.tseries.offsets.BDay(rolling_window+1)).strftime('%Y-%m-%d')
+#     adjusted_end_date = (pd.to_datetime(end_date) + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+#     data = yf.download(ticker, start=start_date_with_buffer, end=adjusted_end_date)
+#     if data.empty:
+#         st.error("No data found for the specified ticker and date range.")
+#         return pd.DataFrame()
+#     if isinstance(data.columns, pd.MultiIndex):
+#         data.columns = data.columns.droplevel(1)
+#     return data
 
 # calculate Rolling Avg and Daily Returns
 def calculate_rolling_avg_volume(data, start_date, rolling_window):
